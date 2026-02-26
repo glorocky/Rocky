@@ -1,4 +1,4 @@
 yfinance
-pandas_ta
+pandas-ta-classic
 requests
 pandas
