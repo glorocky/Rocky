@@ -2,7 +2,7 @@ import os
 import yfinance as yf
 import pandas_ta as ta
 import requests
-import pandas as pd
+import pandas_ta_classic as ta
 
 def get_stock_data():
     token = os.getenv("TELEGRAM_TOKEN")
