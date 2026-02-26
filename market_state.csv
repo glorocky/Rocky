@@ -1,0 +1,61 @@
+symbol,price,vol
+RELIANCE.NS,"Ticker
+RELIANCE.NS    1406.8
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+RELIANCE.NS    739409
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+HDFCBANK.NS,"Ticker
+HDFCBANK.NS    896.05
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+HDFCBANK.NS    4985629
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+BHARTIARTL.NS,"Ticker
+BHARTIARTL.NS    1929.6
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+BHARTIARTL.NS    673318
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+SBIN.NS,"Ticker
+SBIN.NS    1209.5
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+SBIN.NS    2319225
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+ICICIBANK.NS,"Ticker
+ICICIBANK.NS    1404.9
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+ICICIBANK.NS    3860099
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+TCS.NS,"Ticker
+TCS.NS    2648.4
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+TCS.NS    307429
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+BAJFINANCE.NS,"Ticker
+BAJFINANCE.NS    1012.95
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+BAJFINANCE.NS    423556
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+LT.NS,"Ticker
+LT.NS    4286.4
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+LT.NS    84440
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+HINDUNILVR.NS,"Ticker
+HINDUNILVR.NS    2383.3
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+HINDUNILVR.NS    107564
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+INFY.NS,"Ticker
+INFY.NS    1291.0
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+INFY.NS    928534
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+MARUTI.NS,"Ticker
+MARUTI.NS    15201.0
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+MARUTI.NS    22489
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
+AXISBANK.NS,"Ticker
+AXISBANK.NS    1395.5
+Name: 2026-02-26 09:45:00+00:00, dtype: float64","Ticker
+AXISBANK.NS    594420
+Name: 2026-02-26 09:45:00+00:00, dtype: int64"
