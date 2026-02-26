@@ -8,9 +8,6 @@ def get_stock_data():
     token = os.getenv("TELEGRAM_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     
-    # NEW LINE HERE: This links pandas and pandas_ta together
-    import pandas_ta as ta
-    
     symbols = ['RELIANCE.NS', 'HDFCBANK.NS', 'BHARTIARTL.NS', 'SBIN.NS', 'ICICIBANK.NS', 
                'TCS.NS', 'BAJFINANCE.NS', 'LT.NS', 'HINDUNILVR.NS', 'INFY.NS']
 
@@ -18,17 +15,18 @@ def get_stock_data():
     
     for sym in symbols:
         try:
-            # Download data
-            df = yf.download(sym, period='5d', interval='15m', progress=False)
+            # Download data - setting 'auto_adjust' helps with RSI/EMA accuracy
+            df = yf.download(sym, period='5d', interval='15m', progress=False, auto_adjust=True)
             if df.empty: continue
 
-            # Ensure we have a clean 1D Series for Close
-            close = df['Close'].squeeze()
+            # Extract the Close price column
+            close = df['Close']
 
-            # Calculate Indicators
-            rsi = ta.rsi(close, length=14)
-            ema9 = ta.ema(close, length=9)
-            ema21 = ta.ema(close, length=21)
+            # Calculate Indicators using the standard 'ta' library calls
+            # We use .squeeze() to ensure we have a clean data list
+            rsi = ta.rsi(close.squeeze(), length=14)
+            ema9 = ta.ema(close.squeeze(), length=9)
+            ema21 = ta.ema(close.squeeze(), length=21)
 
             # Get latest values
             p = round(float(close.iloc[-1]), 2)
@@ -44,7 +42,8 @@ def get_stock_data():
 
     # Send to Telegram
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    requests.post(url, json={"chat_id": chat_id, "text": report, "parse_mode": "Markdown"})
+    payload = {"chat_id": chat_id, "text": report, "parse_mode": "Markdown"}
+    requests.post(url, json=payload)
 
 if __name__ == "__main__":
     get_stock_data()
