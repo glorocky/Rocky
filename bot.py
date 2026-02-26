@@ -1,8 +1,8 @@
 import os
 import yfinance as yf
-import pandas_ta as ta
+import pandas_ta_classic as ta  # Corrected import name
 import requests
-import pandas_ta_classic as ta
+import pandas as pd
 
 def get_stock_data():
     token = os.getenv("TELEGRAM_TOKEN")
@@ -15,20 +15,17 @@ def get_stock_data():
     
     for sym in symbols:
         try:
-            # Download data - setting 'auto_adjust' helps with RSI/EMA accuracy
             df = yf.download(sym, period='5d', interval='15m', progress=False, auto_adjust=True)
             if df.empty: continue
 
-            # Extract the Close price column
             close = df['Close']
 
-            # Calculate Indicators using the standard 'ta' library calls
-            # We use .squeeze() to ensure we have a clean data list
+            # Indicators
             rsi = ta.rsi(close.squeeze(), length=14)
             ema9 = ta.ema(close.squeeze(), length=9)
             ema21 = ta.ema(close.squeeze(), length=21)
 
-            # Get latest values
+            # Latest values
             p = round(float(close.iloc[-1]), 2)
             r_val = round(float(rsi.iloc[-1]), 2)
             e9_val = round(float(ema9.iloc[-1]), 2)
