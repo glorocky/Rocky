@@ -8,6 +8,9 @@ def get_stock_data():
     token = os.getenv("TELEGRAM_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     
+    # NEW LINE HERE: This links pandas and pandas_ta together
+    import pandas_ta as ta
+    
     symbols = ['RELIANCE.NS', 'HDFCBANK.NS', 'BHARTIARTL.NS', 'SBIN.NS', 'ICICIBANK.NS', 
                'TCS.NS', 'BAJFINANCE.NS', 'LT.NS', 'HINDUNILVR.NS', 'INFY.NS']
 
