@@ -1,4 +1,4 @@
 yfinance
-pandas==2.2.2
+pandas
 requests
-pandas_ta
+pandas-ta-classic
