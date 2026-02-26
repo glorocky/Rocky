@@ -27,10 +27,10 @@ def get_stock_data():
             close_prices = df['Close'].iloc[:, 0] if len(df['Close'].shape) > 1 else df['Close']
             volume_data = df['Volume'].iloc[:, 0] if len(df['Volume'].shape) > 1 else df['Volume']
 
-            # Indicators
-            rsi = ta.rsi(close_prices, length=14)
-            e9 = ta.ema(close_prices, length=9)
-            e21 = ta.ema(close_prices, length=21)
+           # Indicators (Safely handles 2026 data formats)
+            rsi_series = df.ta.rsi(length=14)
+            ema9_series = df.ta.ema(length=9)
+            ema21_series = df.ta.ema(length=21)
 
             # Get Last Values
             p = round(float(close_prices.iloc[-1]), 2)
