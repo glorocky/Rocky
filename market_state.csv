@@ -10,9 +10,9 @@ Name: 2026-02-27 09:45:00+00:00, dtype: float64","Ticker
 HDFCBANK.NS    7262870
 Name: 2026-02-27 09:45:00+00:00, dtype: int64"
 BHARTIARTL.NS,"Ticker
-BHARTIARTL.NS    1881.5
+BHARTIARTL.NS    1879.3
 Name: 2026-02-27 09:45:00+00:00, dtype: float64","Ticker
-BHARTIARTL.NS    2722560
+BHARTIARTL.NS    2735904
 Name: 2026-02-27 09:45:00+00:00, dtype: int64"
 SBIN.NS,"Ticker
 SBIN.NS    1200.0
@@ -25,9 +25,9 @@ Name: 2026-02-27 09:45:00+00:00, dtype: float64","Ticker
 ICICIBANK.NS    2468673
 Name: 2026-02-27 09:45:00+00:00, dtype: int64"
 TCS.NS,"Ticker
-TCS.NS    2640.0
+TCS.NS    2637.4
 Name: 2026-02-27 09:45:00+00:00, dtype: float64","Ticker
-TCS.NS    921047
+TCS.NS    942077
 Name: 2026-02-27 09:45:00+00:00, dtype: int64"
 BAJFINANCE.NS,"Ticker
 BAJFINANCE.NS    996.5
@@ -55,7 +55,7 @@ Name: 2026-02-27 09:45:00+00:00, dtype: float64","Ticker
 MARUTI.NS    120556
 Name: 2026-02-27 09:45:00+00:00, dtype: int64"
 AXISBANK.NS,"Ticker
-AXISBANK.NS    1384.2
+AXISBANK.NS    1383.9
 Name: 2026-02-27 09:45:00+00:00, dtype: float64","Ticker
-AXISBANK.NS    1014582
+AXISBANK.NS    1031790
 Name: 2026-02-27 09:45:00+00:00, dtype: int64"
