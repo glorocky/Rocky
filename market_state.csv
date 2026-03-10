@@ -1,61 +1,61 @@
 symbol,price,vol
 RELIANCE.NS,"Ticker
-RELIANCE.NS    1410.8
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-RELIANCE.NS    342235
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+RELIANCE.NS    1416.0
+Name: 2026-03-10 05:15:00+00:00, dtype: float64","Ticker
+RELIANCE.NS    284261
+Name: 2026-03-10 05:15:00+00:00, dtype: int64"
 HDFCBANK.NS,"Ticker
-HDFCBANK.NS    849.05
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-HDFCBANK.NS    722192
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+HDFCBANK.NS    852.75
+Name: 2026-03-10 05:15:00+00:00, dtype: float64","Ticker
+HDFCBANK.NS    1180804
+Name: 2026-03-10 05:15:00+00:00, dtype: int64"
 BHARTIARTL.NS,"Ticker
-BHARTIARTL.NS    1856.8
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-BHARTIARTL.NS    211826
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+BHARTIARTL.NS    1858.8
+Name: 2026-03-10 05:15:00+00:00, dtype: float64","Ticker
+BHARTIARTL.NS    283929
+Name: 2026-03-10 05:15:00+00:00, dtype: int64"
 SBIN.NS,"Ticker
-SBIN.NS    1109.6
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-SBIN.NS    408178
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+SBIN.NS    1109.8
+Name: 2026-03-10 05:15:00+00:00, dtype: float64","Ticker
+SBIN.NS    540185
+Name: 2026-03-10 05:15:00+00:00, dtype: int64"
 ICICIBANK.NS,"Ticker
-ICICIBANK.NS    1292.8
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-ICICIBANK.NS    348369
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+ICICIBANK.NS    1305.7
+Name: 2026-03-10 05:30:00+00:00, dtype: float64","Ticker
+ICICIBANK.NS    0
+Name: 2026-03-10 05:30:00+00:00, dtype: int64"
 TCS.NS,"Ticker
-TCS.NS    2511.0
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-TCS.NS    93131
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+TCS.NS    2515.7
+Name: 2026-03-10 05:15:00+00:00, dtype: float64","Ticker
+TCS.NS    37435
+Name: 2026-03-10 05:15:00+00:00, dtype: int64"
 BAJFINANCE.NS,"Ticker
-BAJFINANCE.NS    932.8
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-BAJFINANCE.NS    118283
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+BAJFINANCE.NS    939.6
+Name: 2026-03-10 05:30:00+00:00, dtype: float64","Ticker
+BAJFINANCE.NS    0
+Name: 2026-03-10 05:30:00+00:00, dtype: int64"
 LT.NS,"Ticker
-LT.NS    3866.9
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-LT.NS    113604
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+LT.NS    3858.1
+Name: 2026-03-10 05:15:00+00:00, dtype: float64","Ticker
+LT.NS    68642
+Name: 2026-03-10 05:15:00+00:00, dtype: int64"
 HINDUNILVR.NS,"Ticker
-HINDUNILVR.NS    2207.0
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-HINDUNILVR.NS    18105
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+HINDUNILVR.NS    2197.8
+Name: 2026-03-10 05:15:00+00:00, dtype: float64","Ticker
+HINDUNILVR.NS    18904
+Name: 2026-03-10 05:15:00+00:00, dtype: int64"
 INFY.NS,"Ticker
-INFY.NS    1297.0
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-INFY.NS    220425
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+INFY.NS    1298.6
+Name: 2026-03-10 05:15:00+00:00, dtype: float64","Ticker
+INFY.NS    108995
+Name: 2026-03-10 05:15:00+00:00, dtype: int64"
 MARUTI.NS,"Ticker
-MARUTI.NS    13570.0
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-MARUTI.NS    7537
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+MARUTI.NS    13652.0
+Name: 2026-03-10 05:30:00+00:00, dtype: float64","Ticker
+MARUTI.NS    0
+Name: 2026-03-10 05:30:00+00:00, dtype: int64"
 AXISBANK.NS,"Ticker
-AXISBANK.NS    1295.1
-Name: 2026-03-10 04:15:00+00:00, dtype: float64","Ticker
-AXISBANK.NS    159220
-Name: 2026-03-10 04:15:00+00:00, dtype: int64"
+AXISBANK.NS    1305.4
+Name: 2026-03-10 05:30:00+00:00, dtype: float64","Ticker
+AXISBANK.NS    0
+Name: 2026-03-10 05:30:00+00:00, dtype: int64"
