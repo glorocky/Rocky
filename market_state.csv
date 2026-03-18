@@ -40,9 +40,9 @@ Name: 2026-03-18 09:45:00+00:00, dtype: float64","Ticker
 LT.NS    341000
 Name: 2026-03-18 09:45:00+00:00, dtype: int64"
 HINDUNILVR.NS,"Ticker
-HINDUNILVR.NS    2135.8
+HINDUNILVR.NS    2135.3
 Name: 2026-03-18 09:45:00+00:00, dtype: float64","Ticker
-HINDUNILVR.NS    424642
+HINDUNILVR.NS    430623
 Name: 2026-03-18 09:45:00+00:00, dtype: int64"
 INFY.NS,"Ticker
 INFY.NS    1267.1
@@ -50,9 +50,9 @@ Name: 2026-03-18 09:45:00+00:00, dtype: float64","Ticker
 INFY.NS    1066098
 Name: 2026-03-18 09:45:00+00:00, dtype: int64"
 MARUTI.NS,"Ticker
-MARUTI.NS    13055.0
+MARUTI.NS    13048.0
 Name: 2026-03-18 09:45:00+00:00, dtype: float64","Ticker
-MARUTI.NS    24347
+MARUTI.NS    25006
 Name: 2026-03-18 09:45:00+00:00, dtype: int64"
 AXISBANK.NS,"Ticker
 AXISBANK.NS    1253.2
