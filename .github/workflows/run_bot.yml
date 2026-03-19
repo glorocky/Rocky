@@ -6,9 +6,12 @@ on:
     - cron: '*/15 4-10 * * 1-5'
   workflow_dispatch: # Allows you to trigger it manually for testing
 
+permissions:
+  contents: write  # This gives the bot permission to push code/files
 jobs:
   trade_execution:
     runs-on: ubuntu-latest
+    # ... rest of your code ...
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
