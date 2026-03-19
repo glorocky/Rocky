@@ -4,3 +4,4 @@ requests
 pandas-ta-classic
 numpy
 nsepython
+math
