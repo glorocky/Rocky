@@ -2,9 +2,24 @@ import os
 import yfinance as yf
 import pandas_ta_classic as ta
 import requests
-import pandas as pd
 import numpy as np
 from datetime import datetime
+import pandas as pd
+
+def calculate_rsi(data, window=14):
+    delta = data.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
+    rs = gain / loss
+    return 100 - (100 / (1+rs))
+
+def calculate_ema(data, window):
+    return data.ewm(span=window, adjust=False).mean()
+
+# --- Example Usage in your strategy ---
+# df['RSI'] = calculate_rsi(df['Close'])
+# df['EMA_9'] = calculate_ema(df['Close'], 9)
+# df['EMA_21'] = calculate_ema(df['Close'], 21)
 
 # Full Weightage List (Simplified for top heavyweights to prevent API timeout)
 WEIGHTS = {
