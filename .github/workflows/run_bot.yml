@@ -27,11 +27,10 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        # The | below is the secret—it allows multiple python commands in one step
         run: |
-          python BSM_WithAdjoints.py
-          python bot.py
-          python MA50200.py
+          python BSM_WithAdjoints.py || echo "BSM Script Failed"
+          python MA50200.py || echo "MA Strategy Failed"
+          python bot.py || echo "Bot Script Failed"
           
      
 
