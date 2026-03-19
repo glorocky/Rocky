@@ -23,16 +23,20 @@ def send_telegram(message):
 def run_bot():
     print(f"🚀 Starting Market Scan: {pd.Timestamp.now()}")
     
-    # Safely load old data
-    if os.path.exists(CSV_FILE) and os.path.getsize(CSV_FILE) > 0:
+    csv_file = "stock_status.csv"
+    
+    # IMPROVED: Check if file exists AND is not empty
+    if os.path.exists(csv_file) and os.path.getsize(csv_file) > 0:
         try:
-            old_data = pd.read_csv(CSV_FILE, index_col='symbol')
+            old_data = pd.read_csv(csv_file, index_col='symbol')
         except pd.errors.EmptyDataError:
+            print("⚠️ CSV was empty, starting fresh.")
             old_data = pd.DataFrame()
     else:
+        print("📁 No existing data found, creating new session.")
         old_data = pd.DataFrame()
 
-    results = []
+    # ... (rest of your analysis code)
 
     for symbol in STOCKS:
         print(f"\n🔍 Analyzing {symbol}...")
