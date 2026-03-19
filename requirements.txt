@@ -10,3 +10,4 @@ scipy.stats
 norm
 datetime
 deque
+timedelta
