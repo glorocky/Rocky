@@ -20,7 +20,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install scipy requests pandas pandas-ta yfinance
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Run All Strategies
         env:
