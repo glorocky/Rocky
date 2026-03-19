@@ -1,5 +1,29 @@
 import math
 from scipy.stats import norm
+import os
+import requests
+
+def send_telegram_dashboard(iv, delta, vega, theta):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    
+    # Using Markdown for a bold, clean look
+    message = (
+        f"📊 *Option Greek Report*\n"
+        f"━━━━━━━━━━━━━━━\n"
+        f"🔹 *IV:* `{iv:.2%}`\n"
+        f"🔹 *Delta:* `{delta:.4f}`\n"
+        f"🔹 *Vega:* `{vega:.2f}`\n"
+        f"🔹 *Theta:* `{theta:.2f}`\n"
+        f"━━━━━━━━━━━━━━━\n"
+        f"🕒 *Time:* {pd.Timestamp.now('Asia/Kolkata').strftime('%H:%M:%S')}"
+    )
+    
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    requests.post(url, data={"chat_id": chat_id, "text": message, "parse_mode": "Markdown"})
+
+# Call this at the end of your main block
+# send_telegram_dashboard(sig, adjoints[0], adjoints[3], adjoints[5])
 
 
 def BSM_withAdjoints(S0, r, y, sig, K, T):
