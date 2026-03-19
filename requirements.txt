@@ -6,3 +6,4 @@ numpy
 nsepython
 math
 time
+scipy.stats
