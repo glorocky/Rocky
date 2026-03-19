@@ -7,3 +7,4 @@ nsepython
 math
 time
 scipy.stats
+norm
