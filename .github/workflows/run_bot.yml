@@ -6,17 +6,18 @@ on:
   workflow_dispatch:      # Allows manual runs
 
 permissions:
-  contents: write         # CRITICAL: Allows the bot to push the CSV file back
+  contents: write         # Allows the bot to push the CSV file back
 
 jobs:
   trade_execution:
     runs-on: ubuntu-latest
     env:
+      # This tells GitHub to use the newer Node engine immediately
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 # Use v4 (stable) or v6 (bleeding edge)
+        uses: actions/checkout@v4 # Note: v4 is fine, but ensure the env variable above is set
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,8 +28,6 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # Optional: Add fallback if requirements.txt is missing
           pip install pandas yfinance requests
 
       - name: Run All Strategies
@@ -36,7 +35,6 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          # Use -u to see logs in real-time
           python -u BSM_WithAdjoints.py
           python -u MA50200.py
           python -u bot.py
@@ -45,7 +43,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # Check if file exists before adding to avoid errors
           if [ -f stock_status.csv ]; then
             git add stock_status.csv
             git commit -m "Update stock status [skip ci]" || echo "No changes to commit"
