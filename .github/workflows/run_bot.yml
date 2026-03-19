@@ -26,9 +26,15 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python bot.py
-        run: python BSM_WithAdjoints.py
-        run: python MA50200.py
+          # Notice the | symbol below - this allows multiple lines
+        run: |
+          python BSM_withAdjoints.py
+          python strategy_rsi.py
+          python strategy_ema.py
+          python strategy_momentum.py
+          python bot.py
+          python BSM_WithAdjoints.py
+          python MA50200.py
      
 
       - name: Save State
