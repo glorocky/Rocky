@@ -29,12 +29,9 @@ jobs:
         # The | below is the secret—it allows multiple python commands in one step
         run: |
           python BSM_withAdjoints.py
-          python strategy_rsi.py
-          python strategy_ema.py
-          python strategy_momentum.py
           python bot.py
-          python BSM_WithAdjoints.py
           python MA50200.py
+          
      
 
       - name: Save State
