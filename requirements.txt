@@ -9,3 +9,4 @@ time
 scipy.stats
 norm
 datetime
+deque
