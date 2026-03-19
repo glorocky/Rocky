@@ -11,3 +11,4 @@ norm
 datetime
 deque
 timedelta
+statistics
