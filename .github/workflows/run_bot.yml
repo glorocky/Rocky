@@ -1,6 +1,3 @@
-name: Market Strategy Automation
-
-YAML
 name: Run Trading Bot
 on:
   schedule:
