@@ -11,8 +11,8 @@ permissions:
 jobs:
   trade_execution:
     runs-on: ubuntu-latest
+    # Add this env section here
     env:
-      # This line removes the deprecation warning
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
     
     steps:
@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.11'
           
-      # ... rest of your steps ...
+      # ... your existing pip and python run steps ...
 
       - name: Install Dependencies
         run: |
