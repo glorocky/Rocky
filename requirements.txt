@@ -2,4 +2,3 @@ scipy
 requests
 pandas
 yfinance
-https://github.com/twopirllc/pandas-ta/archive/refs/heads/development.zip
