@@ -27,6 +27,9 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python bot.py
+        run: python BSM_WithAdjoints.py
+        run: python MA50200.py
+     
 
       - name: Save State
         run: |
