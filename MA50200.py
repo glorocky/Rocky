@@ -2,12 +2,12 @@ import time
 import math
 from datetime import datetime, timedelta
 from collections import deque
-from growwapi import GrowwAPI
+#from growwapi import GrowwAPI
 import statistics
 
 # Configuration
-api_key = ""
-secret = ""
+#api_key = ""
+#secret = ""
 
 # Strategy parameters (from Pine Script trend.txt)
 FAST_MA_LEN = 50   # Fast EMA length
@@ -33,9 +33,9 @@ TIMEFRAME = 60  # 1 hour candles (can be adjusted)
 stock_data = {}  # Will be initialized for each stock
 
 # Initialize API
-access_token = GrowwAPI.get_access_token(api_key=api_key, secret=secret)
-groww = GrowwAPI(access_token)
-print("✅ Ready to Groww")
+#access_token = GrowwAPI.get_access_token(api_key=api_key, secret=secret)
+#groww = GrowwAPI(access_token)
+#print("✅ Ready to Groww")
 
 # Product type for trading
 PRODUCT_TYPE = groww.PRODUCT_MIS
