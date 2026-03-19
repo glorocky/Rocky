@@ -17,9 +17,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/checkout@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # Change 3.9 to 3.11 here
+          python-version: '3.11' # Keep it here only
 
       - name: Install Dependencies
         run: |
