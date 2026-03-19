@@ -1,10 +1,19 @@
 import os
 import yfinance as yf
-import pandas_ta_classic as ta
 import requests
 import numpy as np
 from datetime import datetime
 import pandas as pd
+
+# Instead of ta.rsi, use this:
+def get_rsi(series, period=14):
+    delta = series.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs))
+# Example usage in your bot:
+# df['RSI'] = get_rsi(df['Close'])
 
 def calculate_rsi(data, window=14):
     delta = data.diff()
