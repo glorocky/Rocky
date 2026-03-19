@@ -52,7 +52,15 @@ def run_bot():
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     
     csv_file = 'market_state.csv'
-    old_data = pd.read_csv(csv_file, index_col='symbol') if os.path.exists(csv_file) else pd.DataFrame()
+    if os.path.exists(csv_file) and os.path.getsize(csv_file) > 0:
+    try:
+        old_data = pd.read_csv(csv_file, index_col='symbol')
+    except pd.errors.EmptyDataError:
+        print("⚠️ CSV was empty, starting with fresh DataFrame.")
+        old_data = pd.DataFrame()
+else:
+    print("📁 No existing data or file is empty. Starting fresh.")
+    old_data = pd.DataFrame()
     
     new_records = []
     report = f"🚀 *Nifty 50 weighted Update* ({datetime.now().strftime('%H:%M')})\n"
