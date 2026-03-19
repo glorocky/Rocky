@@ -2,30 +2,22 @@ import pandas as pd
 import yfinance as yf
 import requests
 import os
-import sys
 
 # --- CONFIGURATION ---
-# Ensure these secrets are set in your GitHub Repository
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 FAST_MA_LEN = 50
 SLOW_MA_LEN = 200
-ATR_LEN = 14
 STOCKS = ["BHARTIARTL.NS", "RELIANCE.NS", "TCS.NS", "INFY.NS"]
 
 def send_telegram(message):
-    """Sends a notification to your Telegram bot"""
     if TOKEN and CHAT_ID:
         url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-        payload = {"chat_id": CHAT_ID, "text": message, "parse_mode": "Markdown"}
         try:
-            requests.post(url, data=payload)
+            requests.post(url, data={"chat_id": CHAT_ID, "text": message, "parse_mode": "Markdown"})
         except Exception as e:
             print(f"Telegram Error: {e}")
-    else:
-        print("⚠️ Telegram Credentials missing. Printing message instead:")
-        print(message)
 
 def run_strategy():
     print(f"🚀 Starting Market Scan: {pd.Timestamp.now()}")
@@ -33,46 +25,55 @@ def run_strategy():
     for symbol in STOCKS:
         print(f"\n🔍 Analyzing {symbol}...")
         
-        # 1. Fetch data (1 year of daily data)
         try:
-            df = yf.download(symbol, period="1y", interval="1d", progress=False)
+            # period="2y" ensures we have enough data for a 200 EMA
+            df = yf.download(symbol, period="2y", interval="1d", progress=False)
+            
             if df.empty or len(df) < SLOW_MA_LEN:
                 print(f"⚠️ Not enough data for {symbol}. Skipping.")
                 continue
-        except Exception as e:
-            print(f"❌ Download Error for {symbol}: {e}")
-            continue
 
-        # 2. Calculate Indicators
-        # Using .iloc[:, 0] to ensure we get a Series if yf returns a MultiIndex
-        close_prices = df['Close'].squeeze() 
-        df['EMA50'] = close_prices.ewm(span=FAST_MA_LEN, adjust=False).mean()
-        df['EMA200'] = close_prices.ewm(span=SLOW_MA_LEN, adjust=False).mean()
-        
-        # Get Current and Previous values
-        curr = df.iloc[-1]
-        prev = df.iloc[-2]
-        
-        price = float(curr['Close'])
-        ema50 = float(curr['EMA50'])
-        ema200 = float(curr['EMA200'])
-        
-        # 3. Logic Check (Crossover)
-        # 50 EMA crosses ABOVE 200 EMA
-        if prev['EMA50'] <= prev['EMA200'] and ema50 > ema200:
-            msg = f"🚀 *BUY SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nEMA50 crossed ABOVE EMA200!"
-            send_telegram(msg)
-            print(f"✅ SIGNAL: {msg}")
+            # FIX: Use .iloc to get just the 'Close' column regardless of Multi-Index
+            # This extracts the price data as a simple 1D list
+            closes = df['Close']
+            if isinstance(closes, pd.DataFrame):
+                closes = closes.iloc[:, 0] # Take first column if it's a dataframe
 
-        # 50 EMA crosses BELOW 200 EMA
-        elif prev['EMA50'] >= prev['EMA200'] and ema50 < ema200:
-            msg = f"📉 *EXIT SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nTrend Reversal: EMA50 below EMA200."
-            send_telegram(msg)
-            print(f"✅ SIGNAL: {msg}")
+            # Calculate EMAs
+            df['EMA50'] = closes.ewm(span=FAST_MA_LEN, adjust=False).mean()
+            df['EMA200'] = closes.ewm(span=SLOW_MA_LEN, adjust=False).mean()
             
-        else:
-            trend = "Bullish 🟢" if ema50 > ema200 else "Bearish 🔴"
-            print(f"Holding: {symbol} is currently {trend} (No new crossover)")
+            # Get latest two rows
+            curr = df.iloc[-1]
+            prev = df.iloc[-2]
+            
+            # FIX: Force extraction of single values using .item() or float conversion
+            # We select the values specifically to avoid the 'Series' error
+            price = float(closes.iloc[-1])
+            ema50_curr = float(curr['EMA50'])
+            ema200_curr = float(curr['EMA200'])
+            ema50_prev = float(prev['EMA50'])
+            ema200_prev = float(prev['EMA200'])
+            
+            # --- Logic Check ---
+            # BUY: 50 crosses ABOVE 200
+            if ema50_prev <= ema200_prev and ema50_curr > ema200_curr:
+                msg = f"🚀 *BUY SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nEMA50 crossed ABOVE EMA200!"
+                send_telegram(msg)
+                print(f"✅ SIGNAL: {msg}")
+
+            # EXIT: 50 crosses BELOW 200
+            elif ema50_prev >= ema200_prev and ema50_curr < ema200_curr:
+                msg = f"📉 *EXIT SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nTrend Reversal: EMA50 below EMA200."
+                send_telegram(msg)
+                print(f"✅ SIGNAL: {msg}")
+                
+            else:
+                trend = "Bullish 🟢" if ema50_curr > ema200_curr else "Bearish 🔴"
+                print(f"Status: {symbol} is {trend} (No crossover today)")
+
+        except Exception as e:
+            print(f"❌ Error processing {symbol}: {str(e)}")
 
     print("\n✅ All stocks scanned. Process complete.")
 
