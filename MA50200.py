@@ -38,7 +38,7 @@ stock_data = {}  # Will be initialized for each stock
 #print("✅ Ready to Groww")
 
 # Product type for trading
-PRODUCT_TYPE = groww.PRODUCT_MIS
+PRODUCT_TYPE = "MIS"
 
 print("\n" + "="*70)
 print("📚 TREND FOLLOWING STRATEGY - MULTI-STOCK")
