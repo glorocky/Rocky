@@ -14,10 +14,10 @@ jobs:
     # ... rest of your code ...
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
         with:
           python-version: '3.11' # Change 3.9 to 3.11 here
 
