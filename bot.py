@@ -1,119 +1,108 @@
-import os
+import pandas as pd
 import yfinance as yf
 import requests
-import numpy as np
-from datetime import datetime
-import pandas as pd
+import os
 
-# Instead of ta.rsi, use this:
-def get_rsi(series, period=14):
-    delta = series.diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-    rs = gain / loss
-    return 100 - (100 / (1 + rs))
-# Example usage in your bot:
-# df['RSI'] = get_rsi(df['Close'])
+# --- CONFIGURATION ---
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+CSV_FILE = "stock_status.csv"
 
-def calculate_rsi(data, window=14):
-    delta = data.diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
-    rs = gain / loss
-    return 100 - (100 / (1+rs))
+FAST_MA_LEN = 50
+SLOW_MA_LEN = 200
+STOCKS = ["BHARTIARTL.NS", "RELIANCE.NS", "TCS.NS", "INFY.NS"]
 
-def calculate_ema(data, window):
-    return data.ewm(span=window, adjust=False).mean()
-
-# --- Example Usage in your strategy ---
-# df['RSI'] = calculate_rsi(df['Close'])
-# df['EMA_9'] = calculate_ema(df['Close'], 9)
-# df['EMA_21'] = calculate_ema(df['Close'], 21)
-
-# Full Weightage List (Simplified for top heavyweights to prevent API timeout)
-WEIGHTS = {
-    'RELIANCE.NS': 9.26, 'HDFCBANK.NS': 6.83, 'BHARTIARTL.NS': 5.70, 'SBIN.NS': 5.42, 
-    'ICICIBANK.NS': 4.90, 'TCS.NS': 4.65, 'BAJFINANCE.NS': 3.11, 'LT.NS': 2.89, 
-    'HINDUNILVR.NS': 2.73, 'INFY.NS': 2.56, 'MARUTI.NS': 2.32, 'AXISBANK.NS': 2.13
-}
-
-def calculate_pivot_points(df):
-    """Calculates Standard Pivot, Support, and Resistance."""
-    high = df['High'].iloc[-1]
-    low = df['Low'].iloc[-1]
-    close = df['Close'].iloc[-1]
-    pivot = (high + low + close) / 3
-    res1 = (2 * pivot) - low
-    sup1 = (2 * pivot) - high
-    return round(pivot, 2), round(res1, 2), round(sup1, 2)
+def send_telegram(message):
+    """Sends a notification to Telegram"""
+    if TOKEN and CHAT_ID:
+        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+        payload = {"chat_id": CHAT_ID, "text": message, "parse_mode": "Markdown"}
+        try:
+            requests.post(url, data=payload)
+        except Exception as e:
+            print(f"Telegram Error: {e}")
+    else:
+        print(f"⚠️ Telegram credentials missing. Message: {message}")
 
 def run_bot():
-    token = os.getenv("TELEGRAM_TOKEN")
-    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    print(f"🚀 Starting Market Scan: {pd.Timestamp.now()}")
     
-    csv_file = 'market_state.csv'
-    if os.path.exists(csv_file) and os.path.getsize(csv_file) > 0:
-    try:
-        old_data = pd.read_csv(csv_file, index_col='symbol')
-    except pd.errors.EmptyDataError:
-        print("⚠️ CSV was empty, starting with fresh DataFrame.")
-        old_data = pd.DataFrame()
-else:
-    print("📁 No existing data or file is empty. Starting fresh.")
-    old_data = pd.DataFrame()
+    # 1. Initialize the results list at the START
+    results = []
     
-    new_records = []
-    report = f"🚀 *Nifty 50 weighted Update* ({datetime.now().strftime('%H:%M')})\n"
-    total_score = 0
-    total_weight = sum(WEIGHTS.values())
-
-    for sym, weight in WEIGHTS.items():
+    # 2. Robust CSV Loading
+    if os.path.exists(CSV_FILE) and os.path.getsize(CSV_FILE) > 0:
         try:
-            df = yf.download(sym, period='2d', interval='15m', progress=False, auto_adjust=True)
-            if df.empty: continue
+            old_data = pd.read_csv(CSV_FILE, index_col='symbol')
+            print("✅ Loaded existing status data.")
+        except Exception as e:
+            print(f"⚠️ Could not read CSV: {e}. Starting fresh.")
+            old_data = pd.DataFrame()
+    else:
+        print("📁 No existing data found or file is empty. Creating new session.")
+        old_data = pd.DataFrame()
+
+    # 3. Process each stock
+    for symbol in STOCKS:
+        print(f"\n🔍 Analyzing {symbol}...")
+        try:
+            # Download 2 years of daily data
+            df = yf.download(symbol, period="2y", interval="1d", progress=False)
             
-            close = df['Close']
-            vol = df['Volume']
-            e9 = ta.ema(close.squeeze(), length=9).iloc[-1]
-            e21 = ta.ema(close.squeeze(), length=21).iloc[-1]
-            pivot, res, sup = calculate_pivot_points(df)
+            if df.empty or len(df) < SLOW_MA_LEN:
+                print(f"⚠️ Not enough data for {symbol}. Skipping.")
+                continue
 
-            curr_p, curr_v = round(close.iloc[-1], 2), vol.iloc[-1]
-            old_p = old_data.loc[sym, 'price'] if sym in old_data.index else curr_p
-            old_v = old_data.loc[sym, 'vol'] if sym in old_data.index else curr_v
-
-            trend = "🟢" if e9 > e21 else "🔴"
-            if trend == "🟢": total_score += weight
+            # Flatten yfinance MultiIndex headers if they exist
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
             
-            report += (f"\n*{sym.split('.')[0]}* {trend}\n"
-                       f"Price: {curr_p} (Prev: {old_p})\n"
-                       f"Vol: {curr_v} (Prev: {old_v})\n"
-                       f"Targets: S:{sup} | R:{res}\n")
+            # Ensure we have a clean Series of Closing prices
+            close_series = df['Close']
+            if isinstance(close_series, pd.DataFrame):
+                close_series = close_series.iloc[:, 0]
 
-            new_records.append({'symbol': sym, 'price': curr_p, 'vol': curr_v})
-        except: continue
+            # Calculate EMAs
+            df['EMA50'] = close_series.ewm(span=FAST_MA_LEN, adjust=False).mean()
+            df['EMA200'] = close_series.ewm(span=SLOW_MA_LEN, adjust=False).mean()
+            
+            curr = df.iloc[-1]
+            prev = df.iloc[-2]
+            
+            # Safe float conversion
+            price = float(close_series.iloc[-1])
+            ema50_curr = float(curr['EMA50'])
+            ema200_curr = float(curr['EMA200'])
+            ema50_prev = float(prev['EMA50'])
+            ema200_prev = float(prev['EMA200'])
+            
+            # 4. Strategy Logic
+            status = "Bearish"
+            if ema50_curr > ema200_curr:
+                status = "Bullish"
+                # BUY: If it was Bearish/Neutral before and just crossed
+                if ema50_prev <= ema200_prev:
+                    send_telegram(f"🚀 *BUY SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nEMA50 crossed ABOVE EMA200!")
+            else:
+                # EXIT: If it was Bullish before and just crossed below
+                if ema50_prev >= ema200_prev:
+                    send_telegram(f"📉 *EXIT SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nTrend Reversal: EMA50 below EMA200.")
 
-    # Sentiment Logic
-    sentiment_ratio = total_score / total_weight
-    strength = round(sentiment_ratio * 10, 1)
-    
-    # NIFTY 50 INDEX DATA
-    nifty = yf.download('^NSEI', period='2d', interval='15m', progress=False)
-    n_p, n_r, n_s = calculate_pivot_points(nifty)
-    
-    conclusion = "🚀 BULLISH (BUY CALL)" if strength > 5.5 else "📉 BEARISH (BUY PUT)"
-    
-    summary = (f"\n🏁 *FINAL NIFTY 50 CONCLUSION*\n"
-               f"Strength Score: {strength}/10\n"
-               f"Nifty Level: {round(nifty['Close'].iloc[-1], 2)}\n"
-               f"Immediate Supp: {n_s}\n"
-               f"Immediate Res: {n_r}\n"
-               f"Decision: *{conclusion}*")
-    
-    requests.post(f"https://api.telegram.org/bot{token}/sendMessage", 
-                  json={"chat_id": chat_id, "text": report + summary, "parse_mode": "Markdown"})
-    
-    pd.DataFrame(new_records).to_csv(csv_file, index=False)
+            print(f"Current Status: {status}")
+            
+            # Store data for CSV
+            results.append({'symbol': symbol, 'status': status, 'last_price': price})
+
+        except Exception as e:
+            print(f"❌ Error processing {symbol}: {str(e)}")
+
+    # 5. Save results to CSV
+    if results:
+        new_df = pd.DataFrame(results).set_index('symbol')
+        new_df.to_csv(CSV_FILE)
+        print(f"\n✅ Status saved to {CSV_FILE}")
+    else:
+        print("\n⚠️ No results were generated to save.")
 
 if __name__ == "__main__":
     run_bot()
