@@ -27,37 +27,31 @@ def send_telegram(message):
 def run_bot():
     print(f"🚀 Starting Market Scan: {pd.Timestamp.now()}")
     
-    # 1. Initialize the results list at the START
     results = []
+    summary_lines = ["📊 *Daily Market Summary* 📊\n"] # New: List to hold summary text
     
-    # 2. Robust CSV Loading
-    if os.path.exists(CSV_FILE) and os.path.getsize(CSV_FILE) > 0:
+    # 1. Load existing CSV data
+    csv_file = "stock_status.csv"
+    if os.path.exists(csv_file) and os.path.getsize(csv_file) > 0:
         try:
-            old_data = pd.read_csv(CSV_FILE, index_col='symbol')
-            print("✅ Loaded existing status data.")
-        except Exception as e:
-            print(f"⚠️ Could not read CSV: {e}. Starting fresh.")
+            old_data = pd.read_csv(csv_file, index_col='symbol')
+        except Exception:
             old_data = pd.DataFrame()
     else:
-        print("📁 No existing data found or file is empty. Creating new session.")
         old_data = pd.DataFrame()
 
-    # 3. Process each stock
     for symbol in STOCKS:
         print(f"\n🔍 Analyzing {symbol}...")
         try:
-            # Download 2 years of daily data
             df = yf.download(symbol, period="2y", interval="1d", progress=False)
             
             if df.empty or len(df) < SLOW_MA_LEN:
-                print(f"⚠️ Not enough data for {symbol}. Skipping.")
                 continue
 
-            # Flatten yfinance MultiIndex headers if they exist
+            # Flatten yf headers
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
             
-            # Ensure we have a clean Series of Closing prices
             close_series = df['Close']
             if isinstance(close_series, pd.DataFrame):
                 close_series = close_series.iloc[:, 0]
@@ -69,40 +63,45 @@ def run_bot():
             curr = df.iloc[-1]
             prev = df.iloc[-2]
             
-            # Safe float conversion
             price = float(close_series.iloc[-1])
             ema50_curr = float(curr['EMA50'])
             ema200_curr = float(curr['EMA200'])
             ema50_prev = float(prev['EMA50'])
             ema200_prev = float(prev['EMA200'])
             
-            # 4. Strategy Logic
-            status = "Bearish"
+            # Logic Check
+            status = "🔴 Bearish"
             if ema50_curr > ema200_curr:
-                status = "Bullish"
-                # BUY: If it was Bearish/Neutral before and just crossed
-                if ema50_prev <= ema200_prev:
-                    send_telegram(f"🚀 *BUY SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nEMA50 crossed ABOVE EMA200!")
+                status = "🟢 Bullish"
+                # ALERT: New Buy Crossover
+                if not old_data.empty and symbol in old_data.index:
+                    if old_data.loc[symbol, 'status'] != "🟢 Bullish":
+                        send_telegram(f"🚀 *NEW BUY SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nTrend flipped to Bullish!")
             else:
-                # EXIT: If it was Bullish before and just crossed below
-                if ema50_prev >= ema200_prev:
-                    send_telegram(f"📉 *EXIT SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nTrend Reversal: EMA50 below EMA200.")
+                # ALERT: New Exit Crossover
+                if not old_data.empty and symbol in old_data.index:
+                    if old_data.loc[symbol, 'status'] != "🔴 Bearish":
+                        send_telegram(f"📉 *NEW EXIT SIGNAL: {symbol}*\nPrice: ₹{price:.2f}\nTrend flipped to Bearish!")
 
-            print(f"Current Status: {status}")
+            # Add this stock to the Daily Summary
+            summary_lines.append(f"{symbol}: {status} (₹{price:.2f})")
             
-            # Store data for CSV
+            # Store data for next run
             results.append({'symbol': symbol, 'status': status, 'last_price': price})
 
         except Exception as e:
             print(f"❌ Error processing {symbol}: {str(e)}")
 
-    # 5. Save results to CSV
+    # 2. SEND THE DAILY SUMMARY
+    if summary_lines:
+        full_summary = "\n".join(summary_lines)
+        send_telegram(full_summary)
+        print("✅ Daily Summary sent to Telegram.")
+
+    # 3. Save to CSV
     if results:
         new_df = pd.DataFrame(results).set_index('symbol')
-        new_df.to_csv(CSV_FILE)
-        print(f"\n✅ Status saved to {CSV_FILE}")
-    else:
-        print("\n⚠️ No results were generated to save.")
+        new_df.to_csv(csv_file)
 
 if __name__ == "__main__":
     run_bot()
