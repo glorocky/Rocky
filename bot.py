@@ -104,4 +104,9 @@ def run_bot():
         new_df.to_csv(csv_file)
 
 if __name__ == "__main__":
+    # 1. TEST MESSAGE (This MUST arrive if your secrets are correct)
+    print("Testing Telegram Connection...")
+    send_telegram("🔔 *TEST ALERT:* If you see this, your GitHub Secrets are working!")
+    
+    # 2. Run the actual bot logic
     run_bot()
