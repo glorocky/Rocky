@@ -1,130 +1,91 @@
-import math
-from scipy.stats import norm
-import os
+import calendar
+import time
 import requests
+import numpy as np
+from scipy.stats import norm
+from NorenRestApiPy.NorenApi import NorenApi
+from datetime import datetime, timedelta
 
-def send_telegram_dashboard(iv, delta, vega, theta):
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    chat_id = os.getenv("TELEGRAM_CHAT_ID")
-    
-    # Using Markdown for a bold, clean look
-    message = (
-        f"📊 *Option Greek Report*\n"
-        f"━━━━━━━━━━━━━━━\n"
-        f"🔹 *IV:* `{iv:.2%}`\n"
-        f"🔹 *Delta:* `{delta:.4f}`\n"
-        f"🔹 *Vega:* `{vega:.2f}`\n"
-        f"🔹 *Theta:* `{theta:.2f}`\n"
-        f"━━━━━━━━━━━━━━━\n"
-        f"🕒 *Time:* {pd.Timestamp.now('Asia/Kolkata').strftime('%H:%M:%S')}"
-    )
-    
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    requests.post(url, data={"chat_id": chat_id, "text": message, "parse_mode": "Markdown"})
+# --- SETTINGS ---
+TELEGRAM_TOKEN = "YOUR_BOT_TOKEN"
+CHAT_ID = "YOUR_CHAT_ID"
 
-# Call this at the end of your main block
-# send_telegram_dashboard(sig, adjoints[0], adjoints[3], adjoints[5])
+# {Symbol: [ShoonyaToken, StrikeStep, ExpiryType]}
+INDICES = {
+    'NIFTY': ['26000', 50, 'weekly'],
+    'BANKNIFTY': ['26009', 100, 'monthly'],
+    'FINNIFTY': ['26037', 50, 'monthly'],
+    'MIDCPNIFTY': ['26030', 25, 'monthly']
+}
 
+def get_last_tuesday(dt):
+    last_day = calendar.monthrange(dt.year, dt.month)[1]
+    last_date = datetime(dt.year, dt.month, last_day)
+    offset = (last_date.weekday() - 1) % 7 # 1 is Tuesday
+    return last_date - timedelta(days=offset)
 
-def BSM_withAdjoints(S0, r, y, sig, K, T):
-    #Evaluation
+def get_days_to_expiry(name, expiry_type):
+    now = datetime.now()
+    if expiry_type == 'weekly':
+        days_ahead = (1 - now.weekday()) % 7 # Target Tuesday
+        if days_ahead == 0 and now.hour >= 15: days_ahead = 7
+        target_date = now + timedelta(days=days_ahead)
+    else:
+        target_date = get_last_tuesday(now)
+        if now.date() > target_date.date() or (now.date() == target_date.date() and now.hour >= 15):
+            next_month = now.replace(day=28) + timedelta(days=5)
+            target_date = get_last_tuesday(next_month)
     
-    sqrtT = math.sqrt(T)
-    
-    df = math.exp(-r * T)
-    F = S0 * math.exp((r - y) * T)
-    std = sig * sqrtT
-    d = math.log(F / K) / std
-    d1, d2 = d + 0.5 * std, d - 0.5 * std
+    expiry_time = target_date.replace(hour=15, minute=30, second=0)
+    seconds_diff = (expiry_time - now).total_seconds()
+    return max(seconds_diff / (365 * 24 * 3600), 0.0001)
 
-    nd1, nd2 = norm.cdf(d1), norm.cdf(d2)
-    Call_P = df * (F * nd1 - K * nd2)
-    Put_P = df * (K * (1 - nd2) - F * (1 - nd1))
-    
-    
+def calculate_bs(S, K, T, r, sigma):
+    d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+    d2 = d1 - sigma * np.sqrt(T)
+    call = (S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2))
+    put = (K * np.exp(-r * T) * norm.cdf(-d2) - S * norm.cdf(-d1))
+    return round(call, 2), round(put, 2)
 
-    # Adjoint calculation
-    
-    v_ = 1.0
-    
-    df_ = v_ * (F * nd1 - K * nd2)
-    F_ = v_ * df * nd1
-    nd1_ = v_ * df * F
-    
-    K_ = - v_ * df * nd2
-    nd2_ = - v_ * df * K
-    
-    d2_ = nd2_ * norm.pdf(d2)
-    d1_ = nd1_ * norm.pdf(d1)
-    
-    d_ = d2_
-    std_ = - 0.5 * d2_
-    d_ += d1_
-    std_ += 0.5 * d1_
-    
-    F_ += d_ / (F * std)
-    K_ -= d_ / (K * std)
-    std_ -= d_ * d / std
-    
-    sig_ = std_ * sqrtT
-    T_ = 0.5 * std_ * sig / sqrtT
-    
-    S0_ = F_ * F / S0
-    r_ = F_ * T * F if r == 0 else 0 
-    
-    y_ = - F_ * T * F if y == 0 else 0
-    T_ += F_ * (r - y) * F
-    
+def send_telegram(message):
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+    payload = {"chat_id": CHAT_ID, "text": message, "parse_mode": "Markdown"}
+    requests.post(url, json=payload)
 
-    r_ += - df_ * df * T  if r == 0 else 0
-    T_ += - df_ * df * r
+def run_strategy():
+    # api = ShoonyaApi() 
+    # api.login(...)
     
-    return (Call_P,Put_P), (S0_, r_, y_, sig_, K_, T_)
-
-
-
-def IVFromPremium(C0,S0, r, y, sig, K, T):
-    V0 = sig #initial guess
+    # India VIX as proxy for IV
+    vix = float(api.get_quotes('NSE', '26017')['lp']) / 100 
+    r = 0.07 
     
-    C=100
-    while abs(C) >= 0.0001:
-        OptionPrice,adjoints= BSM_withAdjoints(S0, r, y, V0, K, T)
-        C1= OptionPrice[0]
-        Cprime = adjoints[3]
-        C = C1 - C0
-        V0 = V0 - C/Cprime
+    msg = [f"📅 *Market Update: {datetime.now().strftime('%H:%M')}*", "-"*20]
 
-    return V0 
-    
+    for name, config in INDICES.items():
+        try:
+            spot = float(api.get_quotes('NSE', config[0])['lp'])
+            atm = round(spot / config[1]) * config[1]
+            T = get_days_to_expiry(name, config[2])
+            
+            ce, pe = calculate_bs(spot, atm, T, r, vix)
+            straddle = round(ce + pe, 2)
+            
+            msg.append(f"*{name}* (ATM: {atm})")
+            msg.append(f"CE: ₹{ce} | PE: ₹{pe}")
+            msg.append(f"💰 *Straddle Price: ₹{straddle}*\n")
+        except:
+            continue
 
+    send_telegram("\n".join(msg))
 
 if __name__ == "__main__":
-    
-    #Example Fwd=22816.60, Rate & Yeild=0,  Vol=0.1352, Strike=22800, DTE=6 (0.016438356)
-    
-    Fwd=22816.60
-    Rate=0
-    Yeild=0
-    Strike=22800
-    DTE=0.016438356 #(6 DTE)
+    while True:
+        now = datetime.now()
+        # Market Hours: 9:15 to 15:30
+        if (now.hour == 9 and now.minute >= 15) or (10 <= now.hour < 15) or (now.hour == 15 and now.minute <= 30):
+            run_strategy()
+            time.sleep(1800) # 30 mins
+        else:
+            time.sleep(60)
 
-
-    callPrem = 149.01
-    initial_guess_vol=0.4
-    
-    sig= IVFromPremium(callPrem,Fwd, Rate,Yeild, initial_guess_vol, Strike, DTE)
-    print("Implied Vol",sig)
-
-    OptionPrice,adjoints= BSM_withAdjoints (Fwd, Rate,Yeild, sig, Strike, DTE)    
-    
-
-    
-    print("Call Option Price:", OptionPrice[0])
-    print("Put Option Price:", OptionPrice[1])
-
-    print("S0/Delta:", adjoints[0])
-    print("r/Rho:", adjoints[1])
-    print("y/Dividend yeild:", adjoints[2])
-    print("sig/Vega:", (adjoints[3]))
-    print("K/Strike:", adjoints[4])
-    print("T/Theta:", (adjoints[5]))  
