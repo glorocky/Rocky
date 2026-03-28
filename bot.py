@@ -8,8 +8,8 @@ TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 CSV_FILE = "stock_status.csv"
 
-FAST_MA_LEN = 50
-SLOW_MA_LEN = 200
+FAST_MA_LEN = 9
+SLOW_MA_LEN = 21
 STOCKS = ["BHARTIARTL.NS", "RELIANCE.NS", "TCS.NS", "INFY.NS"]
 
 def send_telegram(message):
@@ -57,21 +57,21 @@ def run_bot():
                 close_series = close_series.iloc[:, 0]
 
             # Calculate EMAs
-            df['EMA50'] = close_series.ewm(span=FAST_MA_LEN, adjust=False).mean()
-            df['EMA200'] = close_series.ewm(span=SLOW_MA_LEN, adjust=False).mean()
+            df['EMA9'] = close_series.ewm(span=FAST_MA_LEN, adjust=False).mean()
+            df['EMA21'] = close_series.ewm(span=SLOW_MA_LEN, adjust=False).mean()
             
             curr = df.iloc[-1]
             prev = df.iloc[-2]
             
             price = float(close_series.iloc[-1])
-            ema50_curr = float(curr['EMA50'])
-            ema200_curr = float(curr['EMA200'])
-            ema50_prev = float(prev['EMA50'])
-            ema200_prev = float(prev['EMA200'])
+            ema9_curr = float(curr['EMA9'])
+            ema21_curr = float(curr['EMA21'])
+            ema9_prev = float(prev['EMA9'])
+            ema21_prev = float(prev['EMA21'])
             
             # Logic Check
             status = "🔴 Bearish"
-            if ema50_curr > ema200_curr:
+            if ema9_curr > ema21_curr:
                 status = "🟢 Bullish"
                 # ALERT: New Buy Crossover
                 if not old_data.empty and symbol in old_data.index:
