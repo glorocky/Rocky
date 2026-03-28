@@ -100,12 +100,12 @@ def IVFromPremium(C0,S0, r, y, sig, K, T):
 
 if __name__ == "__main__":
     
-    #Example Fwd=22045, Rate & Yeild=0,  Vol=0.1352, Strike=22050, DTE=6 (0.016438356)
+    #Example Fwd=22816.60, Rate & Yeild=0,  Vol=0.1352, Strike=22800, DTE=6 (0.016438356)
     
-    Fwd=22045
+    Fwd=22816.60
     Rate=0
     Yeild=0
-    Strike=22050
+    Strike=22800
     DTE=0.016438356 #(6 DTE)
 
 
