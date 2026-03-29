@@ -1,4 +1,4 @@
-scipy
 requests
+NorenRestApiPy
+pyotp
 pandas
-yfinance
