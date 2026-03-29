@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests NorenRestApiPy pyotp pandas scipy numpy
+          pip install requests NorenRestApiPy pyotp pandas scipy numpy websocket-client
 
       - name: Run Trading Bot
         env:
