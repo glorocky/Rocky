@@ -2,3 +2,5 @@ requests
 NorenRestApiPy
 pyotp
 pandas
+scipy
+numpy
