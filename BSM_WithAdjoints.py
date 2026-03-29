@@ -3,6 +3,47 @@ import requests
 import numpy as np
 from scipy.stats import norm
 from datetime import datetime, timedelta
+from NorenRestApiPy.NorenApi import NorenApi
+import pyotp
+
+# 1. Initialize the Shoonya API class
+class ShoonyaApiPy(NorenApi):
+    def __init__(self):
+        NorenApi.__init__(self, host='https://api.shoonya.com/NorenWClientTP/', 
+                          websocket='wss://api.shoonya.com/NorenWSTP/')
+
+# 2. Define 'api' in the global scope
+api = ShoonyaApiPy()
+
+def login():
+    # Use your actual credentials or GitHub Secrets
+    user    = 'YOUR_USER_ID'
+    pwd     = 'YOUR_PASSWORD'
+    vc      = 'YOUR_VENDOR_CODE'
+    apikey  = 'YOUR_API_KEY'
+    imei    = 'YOUR_IMEI'
+    token   = 'YOUR_TOTP_TOKEN' # The 32-digit seed for TOTP
+    
+    totp = pyotp.TOTP(token).now()
+    
+    # Perform login
+    ret = api.login(userid=user, password=pwd, twoFA=totp, 
+                    vendor_code=vc, api_secret=apikey, imei=imei)
+    
+    if ret and ret.get('stat') == 'Ok':
+        print("Login Successful")
+    else:
+        print(f"Login Failed: {ret}")
+        exit(1)
+
+def run_strategy():
+    # Now 'api' is recognized here
+    # 26017 is the token for INDIA VIX on NSE
+    vix_data = api.get_quotes('NSE', '26017')
+    if vix_data and 'lp' in vix_data:
+        vix = float(vix_data['lp']) / 100 
+        print(f"Current VIX: {vix}")
+    # ... rest of your strategy code
 
 # --- CONFIG & PERSISTENCE ---
 TELEGRAM_TOKEN = "YOUR_BOT_TOKEN"
@@ -72,6 +113,8 @@ def run_strategy():
     send_telegram("\n".join(msg_lines))
 
 if __name__ == "__main__":
+    login()
+    run_strategy()
     while True:
         now = datetime.now()
         # Market Hours logic
