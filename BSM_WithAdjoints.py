@@ -5,6 +5,14 @@ from scipy.stats import norm
 from datetime import datetime, timedelta
 from NorenRestApiPy.NorenApi import NorenApi
 import pyotp
+import base64
+try:
+    # Replace with your actual string to test
+    test_secret = "YOUR_SECRET_HERE".strip().replace(" ", "")
+    base64.b32decode(test_secret, casefold=True)
+    print("Token is valid Base32!")
+except Exception as e:
+    print(f"Token is INVALID: {e}")
 
 # 1. Initialize the Shoonya API class
 class ShoonyaApiPy(NorenApi):
